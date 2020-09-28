@@ -3,55 +3,128 @@ package com.company;
 import java.util.Scanner;
 
 public class Main {
-final static Scanner scanner = new Scanner(System.in);
+    final static Scanner scanner = new Scanner(System.in);
 
     // add two matrices with integer elements
-    private static void add (int[][] matrix1, int[][] matrix2, int rows, int columns){
-        int[][] addition = new int[rows][columns];
-        for (int i = 0; i < matrix1.length; i++) {
-            for (int j = 0; j < columns; j++) {
-                addition[i][j] = matrix1[i][j] + matrix2[i][j];
-                System.out.print(j == columns - 1 ? addition[i][j] + "\n" : addition[i][j] + " ");
+    private static void add (double[][] matrix1, double[][] matrix2){
+        if (matrix1.length != matrix2.length || matrix1[0].length != matrix2[0].length) {
+            System.out.println("The operation cannot be performed.");
+        } else {
+            System.out.println("The result is:");
+            double[][] addition = new double[matrix1.length][matrix1[0].length];
+            for (int i = 0; i < matrix1.length; i++) {
+                for (int j = 0; j < matrix1[0].length; j++) {
+                    addition[i][j] = matrix1[i][j] + matrix2[i][j];
+                    System.out.print(j == matrix1[0].length - 1 ? addition[i][j] + "\n" : addition[i][j] + " ");
+                }
             }
         }
     }
 
     // multiply a matrix by a constant
-    private static void multiply (int[][] matrix, int factor) {
-        for (int[] ints : matrix) {
-            for (int j = 0; j < ints.length; j++) {
-                System.out.print(j == ints.length - 1 ?
-                        ints[j] * factor + "\n" : ints[j] * factor + " ");
+    private static void multiplyByConst (double[][] matrix, double factor) {
+        System.out.println("The result is:");
+        for (double[] doubles : matrix) {
+            for (int j = 0; j < doubles.length; j++) {
+                System.out.print(j == doubles.length - 1 ?
+                        doubles[j] * factor + "\n" : doubles[j] * factor + " ");
             }
         }
     }
 
-    public static void main(String[] args) {
-        // first matrix
-        int row1 = scanner.nextInt();
-        int column1 = scanner.nextInt();
-        int[][] matrix1 = new int[row1][column1];
-        for (int i = 0; i < row1; i++) {
-            for (int j = 0; j < column1; j++) {
-                matrix1[i][j] = scanner.nextInt();
+    // multiply 2 matrices
+    private static void multiplyMatrices (double[][] matrix1, double[][] matrix2) {
+        if (matrix1[0].length != matrix2.length) {
+            System.out.println("The operation cannot be performed.");
+        } else {
+            System.out.println("The result is:");
+            for (double[] doubles : matrix1) {
+                for (int j = 0; j < matrix2[0].length; j++) {
+                    double sum = 0.0;
+                    for (int k = 0; k < matrix2.length; k++) {
+                        sum += doubles[k] * matrix2[k][j];
+                    }
+                    System.out.printf("%.2f ", sum);
+                }
+                System.out.print("\n");
             }
         }
-        int factor = scanner.nextInt();
-        multiply(matrix1, factor);
-//        // second matrix
-//        int row2 = scanner.nextInt();
-//        int column2 = scanner.nextInt();
-//        int[][] matrix2 = new int[row2][column2];
-//        for (int i = 0; i < row2; i++) {
-//            for (int j = 0; j < column2; j++) {
-//                matrix2[i][j] = scanner.nextInt();
-//            }
-//        }
-//
-//        if (row1 != row2 || column1 != column2) {
-//            System.out.println("ERROR");
-//        } else {
-//            add(matrix1, matrix2, row1, column1);
-//        }
+    }
+
+    // take 2 matrices from user input
+    private static Matrices take2Matrices () {
+        // first matrix
+        System.out.println("Enter size of first matrix:");
+        int row1 = scanner.nextInt();
+        int column1 = scanner.nextInt();
+        System.out.println("Enter first matrix:");
+        double[][] matrix1 = new double[row1][column1];
+        for (int i = 0; i < row1; i++) {
+            for (int j = 0; j < column1; j++) {
+                matrix1[i][j] = scanner.nextDouble();
+            }
+        }
+        // second matrix
+        System.out.println("Enter size of second matrix:");
+        int row2 = scanner.nextInt();
+        int column2 = scanner.nextInt();
+        System.out.println("Enter second matrix:");
+        double[][] matrix2 = new double[row2][column2];
+        for (int i = 0; i < row2; i++) {
+            for (int j = 0; j < column2; j++) {
+                matrix2[i][j] = scanner.nextDouble();
+            }
+        }
+        return new Matrices(matrix1, matrix2);
+    }
+
+    private static double[][] take1Matrix () {
+        // first matrix
+        System.out.println("Enter size of matrix:");
+        int row1 = scanner.nextInt();
+        int column1 = scanner.nextInt();
+        System.out.println("Enter matrix:");
+        double[][] matrix1 = new double[row1][column1];
+        for (int i = 0; i < row1; i++) {
+            for (int j = 0; j < column1; j++) {
+                matrix1[i][j] = scanner.nextDouble();
+            }
+        }
+        return matrix1;
+    }
+
+    private static void menu () {
+        System.out.println("""
+                1. Add matrices
+                2. Multiply matrix by a constant
+                3. Multiply matrices
+                0. Exit
+                Your choice:""");
+
+        while (true) {
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1 -> {
+                    Matrices matricesToAdd = take2Matrices();
+                    add(matricesToAdd.matrix1, matricesToAdd.matrix2);
+                }
+                case 2 -> {
+                    double[][] matrix = take1Matrix();
+                    System.out.println("Enter constant:");
+                    double constant = scanner.nextDouble();
+                    multiplyByConst(matrix, constant);
+                }
+                case 3 -> {
+                    Matrices matricesToMultiply = take2Matrices();
+                    multiplyMatrices(matricesToMultiply.matrix1, matricesToMultiply.matrix2);
+                }
+                case 0 -> System.exit(1);
+                default -> throw new IllegalStateException("Unexpected value: " + choice);
+            }
+        }
+
+    }
+    public static void main(String[] args) {
+        menu();
     }
 }
