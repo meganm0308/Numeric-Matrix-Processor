@@ -1,5 +1,4 @@
 package com.company;
-
 import java.util.Scanner;
 
 public class Main {
@@ -51,6 +50,44 @@ public class Main {
         }
     }
 
+    private static void transpose (double[][] matrix, int transposeOption) {
+        System.out.println("The result is:");
+        switch (transposeOption) {
+            case 1:
+                for (int i = 0; i < matrix[0].length; i++) {
+                    for (double[] doubles : matrix) {
+                        System.out.print(doubles[i] + " ");
+                    }
+                    System.out.print("\n");
+                }
+                break;
+            case 2:
+                for (int i = matrix[0].length - 1; i >= 0; i--) {
+                    for (int j = matrix.length - 1; j >= 0; j--) {
+                        System.out.print(matrix[j][i] +  " ");
+                    }
+                    System.out.print("\n");
+                }
+                break;
+            case 3:
+                for (double[] doubles : matrix) {
+                    for (int j = matrix[0].length - 1; j >= 0; j--) {
+                        System.out.print(doubles[j] + " ");
+                    }
+                    System.out.print("\n");
+                }
+                break;
+            case 4:
+                for (int i = matrix.length - 1; i >= 0; i--) {
+                    for (int j = 0; j < matrix[0].length; j++) {
+                        System.out.print(matrix[i][j] + " ");
+                    }
+                    System.out.print("\n");
+                }
+                break;
+        }
+    }
+
     // take 2 matrices from user input
     private static Matrices take2Matrices () {
         // first matrix
@@ -94,14 +131,14 @@ public class Main {
     }
 
     private static void menu () {
-        System.out.println("""
-                1. Add matrices
-                2. Multiply matrix by a constant
-                3. Multiply matrices
-                0. Exit
-                Your choice:""");
-
         while (true) {
+            System.out.println("""
+                    1. Add matrices
+                    2. Multiply matrix by a constant
+                    3. Multiply matrices
+                    4. Transpose matrix
+                    0. Exit
+                    Your choice:""");
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1 -> {
@@ -117,6 +154,17 @@ public class Main {
                 case 3 -> {
                     Matrices matricesToMultiply = take2Matrices();
                     multiplyMatrices(matricesToMultiply.matrix1, matricesToMultiply.matrix2);
+                }
+                case 4 -> {
+                    System.out.println("""
+                            1. Main diagonal
+                            2. Side diagonal
+                            3. Vertical line
+                            4. Horizontal line
+                            Your choice:""");
+                    int transposeOption = scanner.nextInt();
+                    double[][] matrix = take1Matrix();
+                    transpose(matrix, transposeOption);
                 }
                 case 0 -> System.exit(1);
                 default -> throw new IllegalStateException("Unexpected value: " + choice);
