@@ -1,5 +1,4 @@
 package com.company;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -96,21 +95,17 @@ public class Main {
         } else if (matrix.length == 1) {
             return matrix[0][0];
         } else {
-            int result = 0;
+            double result = 0.0;
             for (int i = 0; i < matrix.length; i++) {  // first-row expansion taking matrix[0][i]
                 double[][] reducedMatrix = new double[matrix.length - 1][matrix.length - 1];
 
                 // get the reduced matrix
                 for (int j = 0; j < reducedMatrix.length; j++) {
                     for (int k = 0; k < reducedMatrix.length; k++) {
-                        for (int l = 0; l < matrix.length; l++) {
-                            if (l != i) {
-                                reducedMatrix[j][k] = matrix[j + 1][l];
-                            }
-                        }
+                        // skip the first row and the ith column
+                        reducedMatrix[j][k] = matrix[j + 1][k + (k >= i ? 1 : 0)];
                     }
                 }
-                System.out.println(Arrays.deepToString(reducedMatrix));
                 int cofactor = (int) Math.pow(-1, i + 2);
                 result += matrix[0][i] * cofactor * determinant(reducedMatrix);
             }
