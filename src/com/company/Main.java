@@ -5,30 +5,27 @@ public class Main {
     final static Scanner scanner = new Scanner(System.in);
 
     // add two matrices with integer elements
-    private static void add (double[][] matrix1, double[][] matrix2){
-        if (matrix1.length != matrix2.length || matrix1[0].length != matrix2[0].length) {
-            System.out.println("The operation cannot be performed.");
-        } else {
-            System.out.println("The result is:");
-            double[][] addition = new double[matrix1.length][matrix1[0].length];
-            for (int i = 0; i < matrix1.length; i++) {
-                for (int j = 0; j < matrix1[0].length; j++) {
-                    addition[i][j] = matrix1[i][j] + matrix2[i][j];
-                    System.out.print(j == matrix1[0].length - 1 ? addition[i][j] + "\n" : addition[i][j] + " ");
-                }
+    private static double[][] add (double[][] matrix1, double[][] matrix2) {
+        System.out.println("The result is:");
+        double[][] addition = new double[matrix1.length][matrix1[0].length];
+        for (int i = 0; i < matrix1.length; i++) {
+            for (int j = 0; j < matrix1[0].length; j++) {
+                addition[i][j] = matrix1[i][j] + matrix2[i][j];
             }
         }
+        return addition;
     }
 
     // multiply a matrix by a constant
-    private static void multiplyByConst (double[][] matrix, double factor) {
+    private static double[][] multiplyByConst (double[][] matrix, double factor) {
         System.out.println("The result is:");
-        for (double[] doubles : matrix) {
-            for (int j = 0; j < doubles.length; j++) {
-                System.out.print(j == doubles.length - 1 ?
-                        doubles[j] * factor + "\n" : doubles[j] * factor + " ");
+        double[][] multiply = new double[matrix.length][matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                multiply[i][j] = matrix[i][j] * factor;
             }
         }
+        return multiply;
     }
 
     // multiply 2 matrices
@@ -50,13 +47,14 @@ public class Main {
         }
     }
 
+    // transpose a matrix
     private static void transpose (double[][] matrix, int transposeOption) {
         System.out.println("The result is:");
         switch (transposeOption) {
             case 1:
                 for (int i = 0; i < matrix[0].length; i++) {
-                    for (double[] doubles : matrix) {
-                        System.out.print(doubles[i] + " ");
+                    for (int j = 0; j < matrix.length; j++) {
+                        System.out.print(matrix[j][i] + " ");
                     }
                     System.out.print("\n");
                 }
@@ -102,14 +100,44 @@ public class Main {
                 // get the reduced matrix
                 for (int j = 0; j < reducedMatrix.length; j++) {
                     for (int k = 0; k < reducedMatrix.length; k++) {
-                        // skip the first row and the ith column
                         reducedMatrix[j][k] = matrix[j + 1][k + (k >= i ? 1 : 0)];
                     }
                 }
-                int cofactor = (int) Math.pow(-1, i + 2);
-                result += matrix[0][i] * cofactor * determinant(reducedMatrix);
+                int cofactorSign = (int) Math.pow(-1, i + 2);
+                result += matrix[0][i] * cofactorSign * determinant(reducedMatrix);
             }
             return result;
+        }
+    }
+
+    // calculate the inverse of a matrix
+    private static void inverse (double[][] matrix) {
+        double determinant = determinant(matrix);
+        if (determinant == 0) {
+            System.out.println("This matrix doesn't have an inverse.");
+        } else {
+            double[][] cofactor = new double[matrix.length][matrix.length];
+            for (int i = 0; i < matrix.length; i++) { // row to skip
+                for (int l = 0; l < matrix.length; l++) { // columns to skip
+                    double[][] reducedMatrix = new double[matrix.length - 1][matrix.length - 1];
+
+                    // get the reduced matrix
+                    for (int j = 0; j < reducedMatrix.length; j++) {
+                        for (int k = 0; k < reducedMatrix.length; k++) {
+                            reducedMatrix[j][k] = matrix[j + (j >= i ? 1 : 0)][k + (k >= l ? 1 : 0)];
+                        }
+                    }
+                    cofactor[i][l] = (int) Math.pow(-1, i + l + 2) * determinant(reducedMatrix);
+                }
+            }
+            double[][] transpose = new double[cofactor[0].length][cofactor.length];
+            for (int i = 0; i < cofactor[0].length; i++) {
+                for (int j = 0; j < cofactor.length; j++) {
+                    transpose[i][j] = cofactor[j][i];
+                }
+            }
+            double[][] inverse = multiplyByConst(transpose, 1 / determinant(matrix));
+            printMatrix(inverse);
         }
     }
 
@@ -155,6 +183,15 @@ public class Main {
         return matrix1;
     }
 
+    private static void printMatrix (double[][] matrix) {
+        for (double[] doubles : matrix) {
+            for (int i = 0; i < matrix[0].length; i++) {
+                System.out.printf("%.2f ", doubles[i]);
+            }
+            System.out.print("\n");
+        }
+    }
+
     private static void menu () {
         while (true) {
             System.out.println("1. Add matrices\n" +
@@ -162,20 +199,28 @@ public class Main {
                     "3. Multiply matrices\n" +
                     "4. Transpose matrix\n" +
                     "5. Calculate a determinant\n" +
+                    "6. Inverse matrix\n"+
                     "0. Exit\n" +
                     "Your choice:");
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1: {
                     Matrices matricesToAdd = take2Matrices();
-                    add(matricesToAdd.matrix1, matricesToAdd.matrix2);
+                    if (matricesToAdd.matrix1.length != matricesToAdd.matrix2.length
+                            || matricesToAdd.matrix1[0].length != matricesToAdd.matrix2[0].length) {
+                        System.out.println("The operation cannot be performed.");
+                    } else {
+                        double[][] addition = add(matricesToAdd.matrix1, matricesToAdd.matrix2);
+                        printMatrix(addition);
+                    }
                     break;
                 }
                 case 2: {
                     double[][] matrix = take1Matrix();
                     System.out.println("Enter constant:");
                     double constant = scanner.nextDouble();
-                    multiplyByConst(matrix, constant);
+                    double[][]result = multiplyByConst(matrix, constant);
+                    printMatrix(result);
                     break;
                 }
                 case 3: {
@@ -200,12 +245,16 @@ public class Main {
                     System.out.println(determinant(matrix) + "\n");
                     break;
                 }
+                case 6: {
+                    double[][] matrix = take1Matrix();
+                    inverse(matrix);
+                }
                 case 0: System.exit(1);
                 default: throw new IllegalStateException("Unexpected value: " + choice);
             }
         }
-
     }
+
     public static void main(String[] args) {
         menu();
     }
