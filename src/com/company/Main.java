@@ -1,4 +1,5 @@
 package com.company;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -88,6 +89,35 @@ public class Main {
         }
     }
 
+    // calculate the determinant of a matrix
+    private static double determinant (double[][] matrix) {
+        if (matrix.length == 2) {
+            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+        } else if (matrix.length == 1) {
+            return matrix[0][0];
+        } else {
+            int result = 0;
+            for (int i = 0; i < matrix.length; i++) {  // first-row expansion taking matrix[0][i]
+                double[][] reducedMatrix = new double[matrix.length - 1][matrix.length - 1];
+
+                // get the reduced matrix
+                for (int j = 0; j < reducedMatrix.length; j++) {
+                    for (int k = 0; k < reducedMatrix.length; k++) {
+                        for (int l = 0; l < matrix.length; l++) {
+                            if (l != i) {
+                                reducedMatrix[j][k] = matrix[j + 1][l];
+                            }
+                        }
+                    }
+                }
+                System.out.println(Arrays.deepToString(reducedMatrix));
+                int cofactor = (int) Math.pow(-1, i + 2);
+                result += matrix[0][i] * cofactor * determinant(reducedMatrix);
+            }
+            return result;
+        }
+    }
+
     // take 2 matrices from user input
     private static Matrices take2Matrices () {
         // first matrix
@@ -132,42 +162,51 @@ public class Main {
 
     private static void menu () {
         while (true) {
-            System.out.println("""
-                    1. Add matrices
-                    2. Multiply matrix by a constant
-                    3. Multiply matrices
-                    4. Transpose matrix
-                    0. Exit
-                    Your choice:""");
+            System.out.println("1. Add matrices\n" +
+                    "2. Multiply matrix by a constant\n" +
+                    "3. Multiply matrices\n" +
+                    "4. Transpose matrix\n" +
+                    "5. Calculate a determinant\n" +
+                    "0. Exit\n" +
+                    "Your choice:");
             int choice = scanner.nextInt();
             switch (choice) {
-                case 1 -> {
+                case 1: {
                     Matrices matricesToAdd = take2Matrices();
                     add(matricesToAdd.matrix1, matricesToAdd.matrix2);
+                    break;
                 }
-                case 2 -> {
+                case 2: {
                     double[][] matrix = take1Matrix();
                     System.out.println("Enter constant:");
                     double constant = scanner.nextDouble();
                     multiplyByConst(matrix, constant);
+                    break;
                 }
-                case 3 -> {
+                case 3: {
                     Matrices matricesToMultiply = take2Matrices();
                     multiplyMatrices(matricesToMultiply.matrix1, matricesToMultiply.matrix2);
+                    break;
                 }
-                case 4 -> {
-                    System.out.println("""
-                            1. Main diagonal
-                            2. Side diagonal
-                            3. Vertical line
-                            4. Horizontal line
-                            Your choice:""");
+                case 4: {
+                    System.out.println("1. Main diagonal\n" +
+                            "2. Side diagonal\n" +
+                            "3. Vertical line\n" +
+                            "4. Horizontal line\n" +
+                            "Your choice:");
                     int transposeOption = scanner.nextInt();
                     double[][] matrix = take1Matrix();
                     transpose(matrix, transposeOption);
+                    break;
                 }
-                case 0 -> System.exit(1);
-                default -> throw new IllegalStateException("Unexpected value: " + choice);
+                case 5: {
+                    double[][] matrix = take1Matrix();
+                    System.out.println("The result is:");
+                    System.out.println(determinant(matrix) + "\n");
+                    break;
+                }
+                case 0: System.exit(1);
+                default: throw new IllegalStateException("Unexpected value: " + choice);
             }
         }
 
